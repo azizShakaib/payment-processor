@@ -1,0 +1,10 @@
+// TCP framing and connection handling. Plain Java, no Spring.
+apply plugin: 'application'
+
+dependencies {
+    api project(':common')
+}
+
+application {
+    mainClass = 'dev.paysim.transport.EchoDemo'
+}

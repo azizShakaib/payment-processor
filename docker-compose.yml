@@ -1,0 +1,22 @@
+# Local infrastructure. Phase 0 only needs Postgres running so later phases
+# can plug in without changing anyone's setup. Start with: docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: paysim-postgres
+    environment:
+      POSTGRES_DB: paysim
+      POSTGRES_USER: paysim
+      POSTGRES_PASSWORD: paysim
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paysim -d paysim"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
