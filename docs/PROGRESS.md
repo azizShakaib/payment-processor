@@ -1,7 +1,7 @@
 # Progress
 
-Current phase: **1 (step 4 of 10)**; Phase 0 exercises run in parallel.
-Next: Phase 1 step 4 (`Mti`, `IsoMessage` + builder, typed accessors, `ResponseCode`; field 7/12/13 from a `Clock`). Agreed plan in `docs/ROADMAP.md`, Phase 1.
+Current phase: **1 (step 5 of 10)**; Phase 0 exercises run in parallel.
+Next: Phase 1 step 5 (`IsoPacker`: MTI + bitmap + fields, golden hex for 0100/0110/0800). Agreed plan in `docs/ROADMAP.md`, Phase 1.
 
 | Phase | Status | Notes |
 | --- | --- | --- |
@@ -20,6 +20,7 @@ Next: Phase 1 step 4 (`Mti`, `IsoMessage` + builder, typed accessors, `ResponseC
 - `iso8583-core` (spec model): `FieldType`, `LengthKind`, `Encoding`, `Padding`, `FieldSpec` (self-validating), `MessageSpec` (builder, O(1) lookup), `Specs.PAYSIM_ASCII_87` (31 fields). B fields: length in bytes, hex on the wire in ASCII specs.
 - `iso8583-core` (codecs): `FieldValue` (Text/Binary, toString never shows content), `FieldCodec` pack/unpack for ASCII, BCD and binary, LL/LLL prefixes, padding kept on unpack; `IsoParseException` (field + absolute offset), `IsoPackException`. Errors never contain field values.
 - `iso8583-core` (bitmap): immutable `Bitmap` (bit 1 automatic), `BitmapCodec` hex or binary; strict: flagged-but-empty secondary rejected. `FieldSpec` padding now type-checked.
+- `iso8583-core` (model): `Mti` (+ class/function/origin enums, `responseMti`), immutable `IsoMessage` (builder validates at set time via `FieldCodec.validate`, typed accessors, `responseBuilder` copies echo fields), `ResponseCode`, `NetworkManagementCode`, `IsoDateTimes` (field 7 in UTC). `common`: `Money`.
 - `transport`: `LengthHeader` (BINARY_2, ASCII_4), `FrameCodec` (readFully framing, max frame size, clean vs broken close), `EchoServer` (virtual thread per connection, TCP_NODELAY), `FrameClient`, `EchoDemo`.
 - Tests: split, glued, one-byte-at-a-time, truncated header and payload, bad ASCII header, oversize frame, 50 concurrent clients, client dying mid-frame.
 - `docker-compose.yml` (Postgres 16), GitHub Actions build, README, `docs/lessons/phase-0.md`.

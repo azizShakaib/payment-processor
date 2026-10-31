@@ -30,41 +30,62 @@ public final class FieldCodec {
      * of first place. Nothing is written if the value is rejected.
      */
     public static void pack(FieldSpec spec, FieldValue value, ByteArrayOutputStream out) {
+        Objects.requireNonNull(out, "out must not be null");
+        Checked checked = check(spec, value);
+        byte[] data;
+        if (checked.raw() != null) {
+            data = spec.encoding() == Encoding.BINARY ? checked.raw() : HexCodec.encode(checked.raw());
+        } else {
+            data = spec.encoding() == Encoding.BCD
+                    ? BcdCodec.encode(spec, checked.text())
+                    : checked.text().getBytes(StandardCharsets.US_ASCII);
+        }
+        if (spec.lengthKind() != LengthKind.FIXED) {
+            out.writeBytes(LengthPrefix.encode(spec, checked.length()));
+        }
+        out.writeBytes(data);
+    }
+
+    /**
+     * Runs exactly the checks {@link #pack} runs (value kind, length,
+     * characters, XN sign, fixed-length padding rules) without producing
+     * bytes. Message builders call it when a value is set, so a bad value
+     * fails where it was supplied rather than later at pack time. Throws
+     * {@link IsoPackException}; the message never contains field content.
+     */
+    public static void validate(FieldSpec spec, FieldValue value) {
+        check(spec, value);
+    }
+
+    /** What survived validation: the binary payload or the padded text, and the length to prefix. */
+    private record Checked(byte[] raw, String text, int length) {
+    }
+
+    /** The single source of truth for what a field may hold; used by pack and validate. */
+    private static Checked check(FieldSpec spec, FieldValue value) {
         Objects.requireNonNull(spec, "spec must not be null");
         Objects.requireNonNull(value, "value must not be null");
-        Objects.requireNonNull(out, "out must not be null");
         int field = spec.number();
-        byte[] data;
-        int length;
         if (spec.type() == FieldType.B) {
             if (!(value instanceof FieldValue.Binary binary)) {
                 throw new IsoPackException(field, "type B requires a Binary value, got " + kind(value));
             }
             byte[] raw = binary.value();
-            length = raw.length;
-            checkLength(spec, length);
-            data = spec.encoding() == Encoding.BINARY ? raw : HexCodec.encode(raw);
-        } else {
-            if (!(value instanceof FieldValue.Text text)) {
-                throw new IsoPackException(field,
-                        "type " + spec.type() + " requires a Text value, got " + kind(value));
-            }
-            String s = text.value();
-            checkLength(spec, s.length());
-            TextRules.Violation bad = TextRules.check(spec, s);
-            if (bad != null) {
-                throw new IsoPackException(field, bad.reason());
-            }
-            s = pad(spec, s);
-            length = s.length();
-            data = spec.encoding() == Encoding.BCD
-                    ? BcdCodec.encode(spec, s)
-                    : s.getBytes(StandardCharsets.US_ASCII);
+            checkLength(spec, raw.length);
+            return new Checked(raw, null, raw.length);
         }
-        if (spec.lengthKind() != LengthKind.FIXED) {
-            out.writeBytes(LengthPrefix.encode(spec, length));
+        if (!(value instanceof FieldValue.Text text)) {
+            throw new IsoPackException(field,
+                    "type " + spec.type() + " requires a Text value, got " + kind(value));
         }
-        out.writeBytes(data);
+        String s = text.value();
+        checkLength(spec, s.length());
+        TextRules.Violation bad = TextRules.check(spec, s);
+        if (bad != null) {
+            throw new IsoPackException(field, bad.reason());
+        }
+        s = pad(spec, s);
+        return new Checked(null, s, s.length());
     }
 
     /**

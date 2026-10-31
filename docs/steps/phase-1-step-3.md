@@ -350,4 +350,4 @@ The last line throws `field 1 is the secondary bitmap flag and is set automatica
 
 ## Next step
 
-Step 4: MTI and the message model (coming next).
+[Step 4: MTI and the message model](phase-1-step-4.md)
