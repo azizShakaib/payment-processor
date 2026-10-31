@@ -1,7 +1,7 @@
 # Progress
 
 Current phase: **1 (step 3 of 10)**; Phase 0 exercises run in parallel.
-Next: Phase 1 step 3 (`Bitmap`). Agreed plan in `docs/ROADMAP.md`, Phase 1.
+Next: Phase 1 step 3 (`Bitmap`). Fold in: test that BCD track 2 'D' unpacks as '='; `FieldSpec` should reject LEFT_ZEROS on AN/ANS/Z. Agreed plan in `docs/ROADMAP.md`, Phase 1.
 
 | Phase | Status | Notes |
 | --- | --- | --- |
