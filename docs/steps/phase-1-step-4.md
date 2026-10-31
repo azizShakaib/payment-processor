@@ -411,4 +411,4 @@ Others: `ResponseCodeTest`, `NetworkManagementCodeTest`, `IsoDateTimesTest`.
 
 ## Next step
 
-Step 5: packing and unpacking whole messages (coming next)
+[Step 5: packing and unpacking whole messages](phase-1-step-5.md)

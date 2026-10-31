@@ -1,7 +1,7 @@
 # Progress
 
-Current phase: **1 (step 5 of 10)**; Phase 0 exercises run in parallel.
-Next: Phase 1 step 5 (`IsoPacker`: MTI + bitmap + fields, golden hex for 0100/0110/0800). Agreed plan in `docs/ROADMAP.md`, Phase 1.
+Current phase: **1 (step 6 of 10)**; Phase 0 exercises run in parallel.
+Next: Phase 1 step 6 (`IsoPrinter` + `Pan.maskLenient`). Note for step 7: `IsoPacker.unpack` slice overload copies buffer[0..end). Agreed plan in `docs/ROADMAP.md`, Phase 1.
 
 | Phase | Status | Notes |
 | --- | --- | --- |
@@ -21,6 +21,7 @@ Next: Phase 1 step 5 (`IsoPacker`: MTI + bitmap + fields, golden hex for 0100/01
 - `iso8583-core` (codecs): `FieldValue` (Text/Binary, toString never shows content), `FieldCodec` pack/unpack for ASCII, BCD and binary, LL/LLL prefixes, padding kept on unpack; `IsoParseException` (field + absolute offset), `IsoPackException`. Errors never contain field values.
 - `iso8583-core` (bitmap): immutable `Bitmap` (bit 1 automatic), `BitmapCodec` hex or binary; strict: flagged-but-empty secondary rejected. `FieldSpec` padding now type-checked.
 - `iso8583-core` (model): `Mti` (+ class/function/origin enums, `responseMti`), immutable `IsoMessage` (builder validates at set time via `FieldCodec.validate`, typed accessors, `responseBuilder` copies echo fields), `ResponseCode`, `NetworkManagementCode`, `IsoDateTimes` (field 7 in UTC). `common`: `Money`.
+- `iso8583-core` (packer): `IsoPacker` pack/unpack (MTI field 0 in errors, trailing bytes rejected, trusted construction path), `MtiCodec`. 0800 matches Phase 0 EchoDemo byte for byte.
 - `transport`: `LengthHeader` (BINARY_2, ASCII_4), `FrameCodec` (readFully framing, max frame size, clean vs broken close), `EchoServer` (virtual thread per connection, TCP_NODELAY), `FrameClient`, `EchoDemo`.
 - Tests: split, glued, one-byte-at-a-time, truncated header and payload, bad ASCII header, oversize frame, 50 concurrent clients, client dying mid-frame.
 - `docker-compose.yml` (Postgres 16), GitHub Actions build, README, `docs/lessons/phase-0.md`.

@@ -17,7 +17,7 @@ import java.util.OptionalInt;
  * An ISO 8583 message in memory: an {@link Mti} plus the data elements that
  * are present, each already checked against the {@link MessageSpec}. Immutable;
  * change one through {@link #toBuilder()}. There is no wire format here
- * (packing comes in a later step), and {@link #toString()} lists field
+ * ({@link IsoPacker} converts to and from bytes), and {@link #toString()} lists field
  * numbers only, never values, because values can be card numbers.
  *
  * <p>Equality compares the spec by identity (specs are built once and shared,
@@ -45,6 +45,17 @@ public final class IsoMessage {
         this.spec = spec;
         this.mti = mti;
         this.values = values;
+    }
+
+    /**
+     * Wraps values that were already validated by {@link FieldCodec#unpack},
+     * skipping the builder's per-field validation and the defensive copy.
+     * Trusted input only: the caller (the packer, in this package) hands over
+     * ownership of {@code values} (length 129, indexed by field number) and
+     * never touches it again. Not public on purpose.
+     */
+    static IsoMessage ofTrusted(MessageSpec spec, Mti mti, FieldValue[] values) {
+        return new IsoMessage(spec, mti, values);
     }
 
     public static Builder builder(MessageSpec spec, Mti mti) {
