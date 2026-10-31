@@ -1,0 +1,40 @@
+# CLAUDE.md
+
+ISO 8583 card payment network in Java 21: terminal sim, acquirer, network switch, issuer, clearing, HSM sim. Each party is its own service talking ISO 8583 over length-prefixed TCP. Portfolio and learning project for remote fintech roles; real-money concerns are simulated.
+
+## How we work (every phase)
+1. Read `docs/PROGRESS.md`, then only the current phase's section in `docs/ROADMAP.md`. Do not read other phases.
+2. Propose a short plan (files, classes, tests). Wait for my OK before writing code.
+3. Build the phase in small, tested steps. Commit after each green step. Design and review run on the main model; implementation is delegated to a Sonnet subagent with a self-contained brief, then reviewed before commit.
+4. Write the lesson `docs/lessons/phase-N.md`: concepts, code walkthrough, 4–6 exercises, key terms. I do the exercises; you review them, never solve them unasked.
+5. Draft the phase's LinkedIn post into `docs/linkedin/phase-N.md` (under 200 words, my voice, first person, no hype, no emoji walls).
+6. Update `docs/PROGRESS.md` (status, decisions, next step). Keep it under 60 lines.
+
+## Architecture rules
+- Shared libraries (`common`, `transport`, `iso8583-core`) are plain Java. No Spring, no Lombok.
+- Services (`issuer`, `switch`, `acquirer`, `clearing`, `hsm-sim`) are Spring Boot apps hosting a Netty TCP server. Spring handles config, DI, Actuator and admin REST only, never the ISO 8583 path.
+- Spring Batch only in `clearing`. Kafka for clearing and audit events. Postgres for ledger and cards. Redis for idempotency and BIN cache.
+- Split services only where real companies split. No extra microservices inside one party.
+- Money is `long` minor units plus ISO 4217 currency code. Never `double` or `float`.
+- Never log or store a clear PAN, PIN or track data. Mask PANs as first 6 + last 4.
+
+## Code conventions
+- Java 21: records, sealed types, switch patterns, virtual threads.
+- Package root `dev.paysim.<module>`. Maven multi-module (parent `pom.xml`), Maven Wrapper committed.
+- `-Xlint:all -Werror` stays on. Fix warnings, do not suppress them.
+- Tests: JUnit 5 + AssertJ; Testcontainers for Postgres, Redis and Kafka; JMH for the packer.
+- Every bug fix gets a failing test first.
+
+## Commands
+- Build and test: `./mvnw -q verify`
+- One module: `./mvnw -q -pl transport -am test`
+- One test class: `./mvnw -q -pl transport -am test -Dtest=FrameCodecTest -Dsurefire.failIfNoSpecifiedTests=false`
+- Echo demo: `./mvnw -q -pl transport -am compile exec:java -Dexec.args=ASCII_4`
+- Local Windows only: if downloads fail with PKIX errors, set `MAVEN_OPTS=-Djavax.net.ssl.trustStoreType=Windows-ROOT` (antivirus HTTPS scanning).
+- Infra: `docker compose up -d`
+
+## Token rules for you
+- Read only the files you need; prefer grep and targeted line ranges over whole files.
+- Don't re-read a file you just wrote. Don't paste whole files back to me; show diffs or short excerpts.
+- Run tests with `-q` and show only failures.
+- Keep chat replies short; long explanations go in the lesson file.

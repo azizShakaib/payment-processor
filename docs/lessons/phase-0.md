@@ -130,7 +130,7 @@ Only fields whose bit is set appear, in field-number order, with no separators. 
 Do these in order. Send me your answers and code for review.
 
 1. **Write the 0810 response by hand.** It echoes fields 7, 11 and 70 and adds field 39 = `00`. Work out the new primary bitmap. Hint: field 39 lives in the fifth byte of the bitmap.
-2. **Run the demo with both headers.** `./gradlew :transport:run` and `./gradlew :transport:run --args=ASCII_4`. Explain why the length header shows `0037` in one case and `30303535` in the other.
+2. **Run the demo with both headers.** `./mvnw -q -pl transport -am compile exec:java` and the same with `-Dexec.args=ASCII_4`. Explain why the length header shows `0037` in one case and `30303535` in the other.
 3. **Break it on purpose.** In `FrameCodec.read`, replace `data.readFully(payload)` with `data.read(payload)`. Run the tests. Which fail, and why? Revert afterwards.
 4. **Mismatched headers.** Start an `EchoServer` with `BINARY_2` and connect a `FrameClient` using `ASCII_4`. Predict what happens before running it, then explain what you see.
 5. **Add a test.** Write a test showing that a frame of exactly `maxFrameLength` bytes is accepted and one byte more is rejected.

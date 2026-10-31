@@ -37,12 +37,14 @@ Every arrow is ISO 8583 over TCP with a length header. Services are Spring Boot 
 
 ## Run it
 
-Requires Java 21. The Gradle wrapper downloads Gradle on first run.
+Requires Java 21. The Maven Wrapper (`mvnw`) downloads Maven on first run.
+
+On Windows with antivirus HTTPS scanning (Avast, Kaspersky, corporate proxies), Java may reject the certificate. Point it at the Windows store for that shell: `$env:MAVEN_OPTS="-Djavax.net.ssl.trustStoreType=Windows-ROOT"`.
 
 ```bash
-./gradlew build                          # compile and run all tests
-./gradlew :transport:run                 # echo an ISO 8583 0800 message with a 2-byte binary header
-./gradlew :transport:run --args=ASCII_4  # same, with a 4-digit ASCII header
+./mvnw verify                                                    # compile and run all tests
+./mvnw -q -pl transport -am compile exec:java                    # echo an ISO 8583 0800 message with a 2-byte binary header
+./mvnw -q -pl transport -am compile exec:java -Dexec.args=ASCII_4 # same, with a 4-digit ASCII header
 docker compose up -d                     # Postgres for later phases
 ```
 
