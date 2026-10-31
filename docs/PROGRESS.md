@@ -1,7 +1,7 @@
 # Progress
 
-Current phase: **1 (step 0 of 10)**; Phase 0 exercises run in parallel.
-Next: Phase 1 step 0 (`common`: `Pan`, `Stan`, clock). Agreed plan in `docs/ROADMAP.md`, Phase 1.
+Current phase: **1 (step 1 of 10)**; Phase 0 exercises run in parallel.
+Next: Phase 1 step 1 (`iso8583-core` field model). Agreed plan in `docs/ROADMAP.md`, Phase 1.
 
 | Phase | Status | Notes |
 | --- | --- | --- |
@@ -16,7 +16,7 @@ Next: Phase 1 step 0 (`common`: `Pan`, `Stan`, clock). Agreed plan in `docs/ROAD
 | 8 Portfolio packaging | Not started | |
 
 ## What exists
-- `common`: `Hex` (encode, decode, hex dump).
+- `common`: `Hex` (encode, decode, hex dump), `Pan` (mask 6+4, Luhn; no digits in errors), `Stan` (lock-free, 000001–999999 wrap).
 - `transport`: `LengthHeader` (BINARY_2, ASCII_4), `FrameCodec` (readFully framing, max frame size, clean vs broken close), `EchoServer` (virtual thread per connection, TCP_NODELAY), `FrameClient`, `EchoDemo`.
 - Tests: split, glued, one-byte-at-a-time, truncated header and payload, bad ASCII header, oversize frame, 50 concurrent clients, client dying mid-frame.
 - `docker-compose.yml` (Postgres 16), GitHub Actions build, README, `docs/lessons/phase-0.md`.

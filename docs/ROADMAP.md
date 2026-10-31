@@ -42,7 +42,7 @@ Exercises: add a field definition; property-based round-trip tests; decode a mes
 Done when: round-trip tests pass for every field, JMH benchmark recorded, client signs on and echoes over Netty.
 
 Agreed build plan (2026-10-31). Commit after each green step; stop for review after each step.
-0. `common`: `Pan.mask` (first 6 + last 4), `Stan` (thread-safe, 000001–999999 wrap), injectable `java.time.Clock` use. Tests: masking edge cases, Stan wrap and concurrency.
+0. `common`: `Pan.mask` (first 6 + last 4) and `Pan.isLuhnValid`, `Stan` (thread-safe, 000001–999999 wrap). Tests: masking edge cases, no PAN digits in errors, Stan wrap and concurrency. (Field 7/12/13 time formatting from an injected `Clock` moves to step 4.)
 1. `iso8583-core` field model: `FieldType` (n, an, ans, b, z, x+n), `LengthKind`, `Encoding`, `FieldSpec` record, `MessageSpec` (Java builder), `Specs.PAYSIM_ASCII_87`. Tests: spec validation (2–128, no duplicates).
 2. Field codecs per encoding (ASCII, BCD, binary) with padding; `IsoParseException(field, offset)`. Tests: every type x length kind round trip, too long, bad chars, odd-length BCD.
 3. `Bitmap`: primary/secondary, hex ASCII and binary. Tests: bits 1/64/65/128, secondary auto-set.
