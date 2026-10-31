@@ -466,4 +466,4 @@ Quick experiments. Predict the result first, then run it:
 
 ## Next step
 
-Step 3: bitmaps (coming next). The bitmap says which of fields 2 to 128 are present, and is itself ASCII hex or raw bytes according to the spec.
+[Step 3: bitmaps](phase-1-step-3.md). The bitmap says which of fields 2 to 128 are present, and is itself ASCII hex or raw bytes according to the spec.

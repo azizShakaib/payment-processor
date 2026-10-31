@@ -1,7 +1,7 @@
 # Progress
 
-Current phase: **1 (step 3 of 10)**; Phase 0 exercises run in parallel.
-Next: Phase 1 step 3 (`Bitmap`). Fold in: test that BCD track 2 'D' unpacks as '='; `FieldSpec` should reject LEFT_ZEROS on AN/ANS/Z. Agreed plan in `docs/ROADMAP.md`, Phase 1.
+Current phase: **1 (step 4 of 10)**; Phase 0 exercises run in parallel.
+Next: Phase 1 step 4 (`Mti`, `IsoMessage` + builder, typed accessors, `ResponseCode`; field 7/12/13 from a `Clock`). Agreed plan in `docs/ROADMAP.md`, Phase 1.
 
 | Phase | Status | Notes |
 | --- | --- | --- |
@@ -19,6 +19,7 @@ Next: Phase 1 step 3 (`Bitmap`). Fold in: test that BCD track 2 'D' unpacks as '
 - `common`: `Hex` (encode, decode, hex dump), `Pan` (mask 6+4, Luhn; no digits in errors), `Stan` (lock-free, 000001–999999 wrap).
 - `iso8583-core` (spec model): `FieldType`, `LengthKind`, `Encoding`, `Padding`, `FieldSpec` (self-validating), `MessageSpec` (builder, O(1) lookup), `Specs.PAYSIM_ASCII_87` (31 fields). B fields: length in bytes, hex on the wire in ASCII specs.
 - `iso8583-core` (codecs): `FieldValue` (Text/Binary, toString never shows content), `FieldCodec` pack/unpack for ASCII, BCD and binary, LL/LLL prefixes, padding kept on unpack; `IsoParseException` (field + absolute offset), `IsoPackException`. Errors never contain field values.
+- `iso8583-core` (bitmap): immutable `Bitmap` (bit 1 automatic), `BitmapCodec` hex or binary; strict: flagged-but-empty secondary rejected. `FieldSpec` padding now type-checked.
 - `transport`: `LengthHeader` (BINARY_2, ASCII_4), `FrameCodec` (readFully framing, max frame size, clean vs broken close), `EchoServer` (virtual thread per connection, TCP_NODELAY), `FrameClient`, `EchoDemo`.
 - Tests: split, glued, one-byte-at-a-time, truncated header and payload, bad ASCII header, oversize frame, 50 concurrent clients, client dying mid-frame.
 - `docker-compose.yml` (Postgres 16), GitHub Actions build, README, `docs/lessons/phase-0.md`.

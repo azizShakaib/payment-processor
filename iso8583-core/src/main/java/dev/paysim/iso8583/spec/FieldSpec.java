@@ -50,6 +50,15 @@ public record FieldSpec(
             throw new IllegalArgumentException(
                     label + ": padding must be NONE for " + lengthKind + " fields, got " + padding);
         }
+        if (padding == Padding.LEFT_ZEROS && type != FieldType.N && type != FieldType.XN) {
+            throw new IllegalArgumentException(
+                    label + ": LEFT_ZEROS padding is only valid for type N or XN, not " + type);
+        }
+        if (padding == Padding.RIGHT_SPACES
+                && type != FieldType.AN && type != FieldType.ANS && type != FieldType.Z) {
+            throw new IllegalArgumentException(
+                    label + ": RIGHT_SPACES padding is only valid for type AN, ANS or Z, not " + type);
+        }
         if (type == FieldType.B && padding != Padding.NONE) {
             throw new IllegalArgumentException(label + ": padding must be NONE for type B, got " + padding);
         }

@@ -73,6 +73,19 @@ class BcdFieldCodecTest {
     }
 
     @Test
+    void fullTrackTwoWithDSeparatorPacksLikeEqualsAndUnpacksWithEquals() {
+        FieldSpec spec = spec(FieldType.Z, LengthKind.LLVAR, 37, Encoding.BCD);
+        String withD = "4111111111111111D2512101";
+        String withEquals = "4111111111111111=2512101";
+
+        String packed = packHex(spec, FieldValue.text(withD));
+
+        assertThat(packed).isEqualTo(packHex(spec, FieldValue.text(withEquals)));
+        assertThat(packed).isEqualTo("244111111111111111D2512101");
+        assertThat(unpackAt(spec, packed).value()).isEqualTo(FieldValue.text(withEquals));
+    }
+
+    @Test
     void binaryEncodedLengthPrefixIsAlsoBcd() {
         FieldSpec spec = spec(FieldType.B, LengthKind.LLLVAR, 255, Encoding.BINARY);
         assertThat(packHex(spec, FieldValue.binary(new byte[3]))).isEqualTo("0003000000");

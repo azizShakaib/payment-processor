@@ -132,6 +132,32 @@ class FieldSpecTest {
     }
 
     @Test
+    void rejectsLeftZerosPaddingUnlessNumeric() {
+        assertThatThrownBy(() -> new FieldSpec(41, "Terminal", ANS, FIXED, 8, ASCII, LEFT_ZEROS))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("field 41");
+        assertThatThrownBy(() -> new FieldSpec(39, "Response", AN, FIXED, 2, ASCII, LEFT_ZEROS))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("field 39");
+        assertThatThrownBy(() -> new FieldSpec(35, "Track 2", Z, FIXED, 37, ASCII, LEFT_ZEROS))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("field 35");
+        assertThat(new FieldSpec(28, "Fee", XN, FIXED, 9, ASCII, LEFT_ZEROS).padding()).isEqualTo(LEFT_ZEROS);
+    }
+
+    @Test
+    void rejectsRightSpacesPaddingUnlessText() {
+        assertThatThrownBy(() -> new FieldSpec(4, "Amount", N, FIXED, 12, ASCII, RIGHT_SPACES))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("field 4");
+        assertThatThrownBy(() -> new FieldSpec(28, "Fee", XN, FIXED, 9, ASCII, RIGHT_SPACES))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("field 28");
+        assertThat(new FieldSpec(41, "Terminal", ANS, FIXED, 8, ASCII, RIGHT_SPACES).padding())
+                .isEqualTo(RIGHT_SPACES);
+    }
+
+    @Test
     void ofPicksLeftZerosForFixedNumericAndSignedAmount() {
         assertThat(FieldSpec.of(4, "Amount", N, FIXED, 12, ASCII).padding()).isEqualTo(LEFT_ZEROS);
         assertThat(FieldSpec.of(28, "Fee", XN, FIXED, 9, ASCII).padding()).isEqualTo(LEFT_ZEROS);

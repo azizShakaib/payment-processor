@@ -9,7 +9,7 @@ This is a learning and portfolio project. Real-money concerns (PCI-DSS certifica
 | Phase | Focus | Status |
 | --- | --- | --- |
 | 0 | TCP framing, repo setup | Done |
-| 1 | ISO 8583 library, Netty server, 0800 sign-on and echo | In progress: steps 0–2 of 10 done |
+| 1 | ISO 8583 library, Netty server, 0800 sign-on and echo | In progress: steps 0–3 of 10 done |
 | 2 | Issuer authorization host, double-entry ledger | Planned |
 | 3 | Network switch: BIN routing, STIP, reversals | Planned |
 | 4 | Terminal simulator, load generator, latency | Planned |
@@ -35,8 +35,9 @@ Every arrow is ISO 8583 over TCP with a length header. Services are Spring Boot 
 | 0 | `common`: PAN masking + Luhn, STAN generator | Done |
 | 1 | `iso8583-core`: field spec model, `paysim-ascii-87` spec (31 fields) | Done |
 | 2 | `iso8583-core`: field codecs (ASCII, BCD, binary, LL/LLL prefixes) | Done |
-| 3 | Bitmap (primary/secondary) | Next |
-| 4–6 | Message model, packer, masked pretty-printer | Planned |
+| 3 | Bitmap (primary/secondary, hex or binary) | Done |
+| 4 | MTI and immutable message model | Next |
+| 5–6 | Packer, masked pretty-printer | Planned |
 | 7 | JMH benchmarks | Planned |
 | 8–9 | Netty transport, `iso8583-link` sign-on/echo/keep-alive | Planned |
 
@@ -46,7 +47,7 @@ Every arrow is ISO 8583 over TCP with a length header. Services are Spring Boot 
 | --- | --- |
 | `common` | Hex dumps, PAN masking and Luhn check, STAN generator |
 | `transport` | TCP framing (`FrameCodec`), echo server and client |
-| `iso8583-core` | Field specs, field codecs; bitmap, message model and packer next |
+| `iso8583-core` | Field specs, field codecs, bitmaps; message model and packer next |
 
 ## Run it
 

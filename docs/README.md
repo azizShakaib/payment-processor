@@ -20,7 +20,8 @@ Terminal ──> Acquirer ──> Switch ──> Issuer          (services, Phas
 | 0 | [phase-1-step-0](steps/phase-1-step-0.md) | Card numbers (PAN), masking, Luhn, trace numbers (STAN) |
 | 1 | [phase-1-step-1](steps/phase-1-step-1.md) | Message specs: why ISO 8583 is a framework, not a format |
 | 2 | [phase-1-step-2](steps/phase-1-step-2.md) | Field encodings: ASCII, BCD, binary, length prefixes |
-| 3 | _next_ | Bitmaps |
+| 3 | [phase-1-step-3](steps/phase-1-step-3.md) | Bitmaps: how a message says which fields it carries |
+| 4 | _next_ | MTI and the message model |
 
 ## Reference
 - [Roadmap](ROADMAP.md) · [Progress](PROGRESS.md)
