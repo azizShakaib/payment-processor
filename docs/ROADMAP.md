@@ -48,7 +48,7 @@ Agreed build plan (2026-10-31). Commit after each green step; stop for review af
 3. `Bitmap`: primary/secondary, hex ASCII and binary. Tests: bits 1/64/65/128, secondary auto-set.
 4. `Mti` record, immutable `IsoMessage` + builder, typed accessors (2, 3, 4, 7, 11, 12, 13, 37, 38, 39, 41, 42, 49, 70), `ResponseCode` enum. Tests: unknown field rejected, 0100->0110.
 5. `IsoPacker` pack/unpack. Tests: hand-checked hex for 0100/0110/0800, round trip every spec field, errors name field + offset.
-6. `IsoPrinter`: masks 2, 35, 45, 52; truncates 55. Test: output never contains a clear PAN.
+6. `IsoPrinter`: masks 2, 35, 45, 52; truncates 55. Add `Pan.maskLenient` (never throws; malformed input prints only its length) so logging a bad message can't fail or leak. Test: output never contains a clear PAN, including malformed field 2. Lesson note: 6+4 on a 12-digit PAN hides only 2 digits; 8-digit BINs since 2022.
 7. `benchmarks` module (JMH), outside the default build. Record pack/unpack throughput.
 8. Netty in `transport`: decoder/encoder for BINARY_2 and ASCII_4 (custom), `NettyServer`, `NettyClient` (reconnect, backoff + jitter), `IdleStateHandler`. Tests: Phase 0 framing cases via `EmbeddedChannel`, reconnect. Never block the event loop.
 9. `iso8583-link`: sign-on/off/echo builders and responder, keep-alive, `PendingRequests` (STAN matching). Integration test: sign on, echo, server restart, reconnect, sign on again.

@@ -13,8 +13,9 @@
         <!-- Phase 0 -->
         <module>common</module>
         <module>transport</module>
+        <!-- Phase 1 -->
+        <module>iso8583-core</module>
         <!-- Added in later phases:
-             Phase 1: iso8583-core
              Phase 2: issuer
              Phase 3: switch, acquirer
              Phase 4: terminal-sim
@@ -46,6 +47,11 @@
             <dependency>
                 <groupId>dev.paysim</groupId>
                 <artifactId>transport</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.paysim</groupId>
+                <artifactId>iso8583-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
