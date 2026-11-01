@@ -1,7 +1,7 @@
 # Progress
 
-Current phase: **1 (step 8 of 10)**; Phase 0 exercises run in parallel.
-Next: Phase 1 step 8 (Netty in `transport`). Note for step 7: `IsoPacker.unpack` slice overload copies buffer[0..end). Agreed plan in `docs/ROADMAP.md`, Phase 1.
+Current phase: **1 (step 9 of 10)**; Phase 0 exercises run in parallel.
+Next: Phase 1 step 9 (`iso8583-link`: sign-on/off, echo, keep-alive, `PendingRequests`). Note for step 7: `IsoPacker.unpack` slice overload copies buffer[0..end). Agreed plan in `docs/ROADMAP.md`, Phase 1.
 
 | Phase | Status | Notes |
 | --- | --- | --- |
@@ -24,7 +24,8 @@ Next: Phase 1 step 8 (Netty in `transport`). Note for step 7: `IsoPacker.unpack`
 - `iso8583-core` (packer): `IsoPacker` pack/unpack (MTI field 0 in errors, trailing bytes rejected, trusted construction path), `MtiCodec`. 0800 matches Phase 0 EchoDemo byte for byte.
 - `iso8583-core` (printer): `IsoPrinter.format` with per-field `MaskingRules` (PAN 6+4, track 2 masked, track 1/PIN/ICC length only, MAC shown), `safeDump` never hex-dumps. `common`: `Pan.maskLenient`.
 - `benchmarks`: JMH 1.37, shaded jar. i5-10400F: unpack ASCII 0100 ~1.07 µs / 4.6 KB, pack ~2.1 µs, masked format ~9.6 µs. Slice unpack no longer copies (limit threaded through codecs): near-end 7.1 µs/70 KB -> 1.0 µs/4.6 KB. Results in `docs/benchmarks/phase-1.md`.
-- `transport`: `LengthHeader` (BINARY_2, ASCII_4), `FrameCodec` (readFully framing, max frame size, clean vs broken close), `EchoServer` (virtual thread per connection, TCP_NODELAY), `FrameClient`, `EchoDemo`.
+- `transport` (Netty 4.1.121): `LengthHeaderFrameDecoder/Encoder` (byte-equal to Phase 0), `NettyFrameServer`, `NettyFrameClient` (full-jitter `Backoff`, fail-fast send), idle events, `SerialExecutor` per connection on virtual threads. Transport logs lengths only. Windows quirk: 50 simultaneous loopback connects can fail `setsockopt`; test connects sequentially.
+- `transport` (Phase 0): `LengthHeader` (BINARY_2, ASCII_4), `FrameCodec` (readFully framing, max frame size, clean vs broken close), `EchoServer` (virtual thread per connection, TCP_NODELAY), `FrameClient`, `EchoDemo`.
 - Tests: split, glued, one-byte-at-a-time, truncated header and payload, bad ASCII header, oversize frame, 50 concurrent clients, client dying mid-frame.
 - `docker-compose.yml` (Postgres 16), GitHub Actions build, README, `docs/lessons/phase-0.md`.
 

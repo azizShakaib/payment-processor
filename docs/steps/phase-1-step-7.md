@@ -258,4 +258,4 @@ Write your prediction down before running each one: a number or a ratio, and a o
 
 ## Next step
 
-Step 8: Netty transport (coming next)
+[Step 8: Netty transport](phase-1-step-8.md)

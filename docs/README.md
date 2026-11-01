@@ -25,7 +25,8 @@ Terminal ──> Acquirer ──> Switch ──> Issuer          (services, Phas
 | 5 | [phase-1-step-5](steps/phase-1-step-5.md) | Packing whole messages; why one wrong field breaks the rest |
 | 6 | [phase-1-step-6](steps/phase-1-step-6.md) | Masking: logging messages without leaking card data |
 | 7 | [phase-1-step-7](steps/phase-1-step-7.md) | Benchmarking the packer (JMH); [results](benchmarks/phase-1.md) |
-| 8 | _next_ | Netty transport |
+| 8 | [phase-1-step-8](steps/phase-1-step-8.md) | Long-lived links over Netty: framing, reconnect, idle detection |
+| 9 | _next_ | Sign-on, echo and keep-alive |
 
 ## Reference
 - [Roadmap](ROADMAP.md) · [Progress](PROGRESS.md)

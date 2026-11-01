@@ -17,13 +17,13 @@ public enum LengthHeader {
      */
     BINARY_2(2, 0xFFFF) {
         @Override
-        byte[] encode(int length) {
+        public byte[] encode(int length) {
             checkRange(length);
             return new byte[] {(byte) (length >>> 8), (byte) length};
         }
 
         @Override
-        int decode(byte[] header) {
+        public int decode(byte[] header) {
             return ((header[0] & 0xFF) << 8) | (header[1] & 0xFF);
         }
     },
@@ -34,13 +34,13 @@ public enum LengthHeader {
      */
     ASCII_4(4, 9_999) {
         @Override
-        byte[] encode(int length) {
+        public byte[] encode(int length) {
             checkRange(length);
             return String.format("%04d", length).getBytes(StandardCharsets.US_ASCII);
         }
 
         @Override
-        int decode(byte[] header) {
+        public int decode(byte[] header) {
             int value = 0;
             for (byte b : header) {
                 if (b < '0' || b > '9') {
@@ -71,9 +71,11 @@ public enum LengthHeader {
         return maxLength;
     }
 
-    abstract byte[] encode(int length);
+    /** Header bytes for a payload of {@code length} bytes. */
+    public abstract byte[] encode(int length);
 
-    abstract int decode(byte[] header);
+    /** Payload length described by {@code header}; throws {@link FramingException} if malformed. */
+    public abstract int decode(byte[] header);
 
     void checkRange(int length) {
         if (length < 0 || length > maxLength) {

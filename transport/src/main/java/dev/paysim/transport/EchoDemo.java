@@ -6,7 +6,7 @@ import java.time.Duration;
 
 /**
  * Runs the echo server and sends it the ISO 8583 echo test request from the
- * Phase 0 lesson. Run it with {@code ./gradlew :transport:run} or from your IDE;
+ * Phase 0 lesson. Run it with {@code ./mvnw -q -pl transport -am compile exec:java} or from your IDE;
  * pass {@code --args=ASCII_4} to try the ASCII length header.
  *
  * <pre>
@@ -22,6 +22,7 @@ public final class EchoDemo {
         LengthHeader header = args.length > 0 ? LengthHeader.valueOf(args[0]) : LengthHeader.BINARY_2;
         FrameCodec codec = new FrameCodec(header);
 
+        // Hex output below is demo output only: this hand-made message carries no card data.
         String message = "0800" + "8220000000000000" + "0400000000000000" + "1015042100" + "000001" + "301";
         byte[] payload = message.getBytes(StandardCharsets.US_ASCII);
 

@@ -18,6 +18,10 @@
             <groupId>dev.paysim</groupId>
             <artifactId>common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,6 +1,5 @@
 package dev.paysim.transport;
 
-import dev.paysim.common.Hex;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -85,8 +84,9 @@ public final class EchoServer implements AutoCloseable {
             OutputStream out = new BufferedOutputStream(socket.getOutputStream());
             byte[] payload;
             while ((payload = codec.read(in)) != null) {
-                byte[] frame = payload;
-                LOG.finer(() -> "From " + peer + ":\n" + Hex.dump(frame));
+                // Log the length only: a frame may carry card data, and payloads must never reach logs.
+                int length = payload.length;
+                LOG.finer(() -> "From " + peer + ": " + length + " byte frame");
                 codec.write(out, payload);
                 framesEchoed.incrementAndGet();
             }

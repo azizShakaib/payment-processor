@@ -39,6 +39,7 @@
         <enforcer-plugin.version>3.5.0</enforcer-plugin.version>
         <shade-plugin.version>3.6.0</shade-plugin.version>
         <jmh.version>1.37</jmh.version>
+        <netty.version>4.1.121.Final</netty.version>
     </properties>
 
     <dependencyManagement>
@@ -57,6 +58,13 @@
                 <groupId>dev.paysim</groupId>
                 <artifactId>iso8583-core</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
