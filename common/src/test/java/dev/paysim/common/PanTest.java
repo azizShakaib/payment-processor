@@ -86,4 +86,29 @@ class PanTest {
         assertThatThrownBy(() -> Pan.isLuhnValid("41111111111111a1"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void lenientMatchesMaskForValidPans() {
+        for (String pan : new String[] {"4111111111111111", "123456789012", "1234567890123456789"}) {
+            assertThat(Pan.maskLenient(pan)).isEqualTo(Pan.mask(pan));
+        }
+    }
+
+    @Test
+    void lenientNeverThrowsAndShowsOnlyTheLengthForInvalidInput() {
+        assertThat(Pan.maskLenient("4111x11111111111")).isEqualTo("[16 chars]");
+        assertThat(Pan.maskLenient("12345678901")).isEqualTo("[11 chars]");
+        assertThat(Pan.maskLenient("12345678901234567890")).isEqualTo("[20 chars]");
+        assertThat(Pan.maskLenient("")).isEqualTo("[0 chars]");
+        assertThat(Pan.maskLenient(null)).isEqualTo("[null]");
+        assertThat(Pan.maskLenient("            ")).isEqualTo("[12 chars]");
+        assertThat(Pan.maskLenient("4111 1111 1111 1111")).isEqualTo("[19 chars]");
+    }
+
+    @Test
+    void lenientRejectsNonAsciiDigits() {
+        String arabicIndic = "٤".repeat(12);
+        assertThat(arabicIndic).hasSize(12);
+        assertThat(Pan.maskLenient(arabicIndic)).isEqualTo("[12 chars]");
+    }
 }

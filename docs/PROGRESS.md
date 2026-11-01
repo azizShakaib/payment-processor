@@ -1,7 +1,7 @@
 # Progress
 
-Current phase: **1 (step 6 of 10)**; Phase 0 exercises run in parallel.
-Next: Phase 1 step 6 (`IsoPrinter` + `Pan.maskLenient`). Note for step 7: `IsoPacker.unpack` slice overload copies buffer[0..end). Agreed plan in `docs/ROADMAP.md`, Phase 1.
+Current phase: **1 (step 7 of 10)**; Phase 0 exercises run in parallel.
+Next: Phase 1 step 7 (JMH `benchmarks` module). Note for step 7: `IsoPacker.unpack` slice overload copies buffer[0..end). Agreed plan in `docs/ROADMAP.md`, Phase 1.
 
 | Phase | Status | Notes |
 | --- | --- | --- |
@@ -22,6 +22,7 @@ Next: Phase 1 step 6 (`IsoPrinter` + `Pan.maskLenient`). Note for step 7: `IsoPa
 - `iso8583-core` (bitmap): immutable `Bitmap` (bit 1 automatic), `BitmapCodec` hex or binary; strict: flagged-but-empty secondary rejected. `FieldSpec` padding now type-checked.
 - `iso8583-core` (model): `Mti` (+ class/function/origin enums, `responseMti`), immutable `IsoMessage` (builder validates at set time via `FieldCodec.validate`, typed accessors, `responseBuilder` copies echo fields), `ResponseCode`, `NetworkManagementCode`, `IsoDateTimes` (field 7 in UTC). `common`: `Money`.
 - `iso8583-core` (packer): `IsoPacker` pack/unpack (MTI field 0 in errors, trailing bytes rejected, trusted construction path), `MtiCodec`. 0800 matches Phase 0 EchoDemo byte for byte.
+- `iso8583-core` (printer): `IsoPrinter.format` with per-field `MaskingRules` (PAN 6+4, track 2 masked, track 1/PIN/ICC length only, MAC shown), `safeDump` never hex-dumps. `common`: `Pan.maskLenient`.
 - `transport`: `LengthHeader` (BINARY_2, ASCII_4), `FrameCodec` (readFully framing, max frame size, clean vs broken close), `EchoServer` (virtual thread per connection, TCP_NODELAY), `FrameClient`, `EchoDemo`.
 - Tests: split, glued, one-byte-at-a-time, truncated header and payload, bad ASCII header, oversize frame, 50 concurrent clients, client dying mid-frame.
 - `docker-compose.yml` (Postgres 16), GitHub Actions build, README, `docs/lessons/phase-0.md`.
@@ -33,7 +34,8 @@ Next: Phase 1 step 6 (`IsoPrinter` + `Pan.maskLenient`). Note for step 7: `IsoPa
 - 2026-10-31: Maven multi-module with Maven Wrapper (migrated from Gradle).
 - `iso8583-link` module holds network management (sign-on, echo, keep-alive, STAN matching); `transport` stays message-agnostic.
 - ISO 8583 specs are Java code (`MessageSpec.builder`), no YAML.
-- Printer masks fields 2, 35, 45, 52 and truncates 55, not just 2 and 35.
+- Printer masks fields 2, 35, 45, 52 and hides 55 entirely (EMV tags 5A/57 can carry PAN and track 2), not just 2 and 35.
+- Transport logs frame lengths only; Phase 0 `EchoServer` FINER hex dump to be removed in step 8.
 - Local Windows builds need `MAVEN_OPTS=-Djavax.net.ssl.trustStoreType=Windows-ROOT` (Avast HTTPS scanning breaks Java TLS).
 
 ## LinkedIn

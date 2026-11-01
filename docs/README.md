@@ -23,7 +23,8 @@ Terminal ──> Acquirer ──> Switch ──> Issuer          (services, Phas
 | 3 | [phase-1-step-3](steps/phase-1-step-3.md) | Bitmaps: how a message says which fields it carries |
 | 4 | [phase-1-step-4](steps/phase-1-step-4.md) | MTI, message lifecycle, response codes, money |
 | 5 | [phase-1-step-5](steps/phase-1-step-5.md) | Packing whole messages; why one wrong field breaks the rest |
-| 6 | _next_ | Masked pretty-printer |
+| 6 | [phase-1-step-6](steps/phase-1-step-6.md) | Masking: logging messages without leaking card data |
+| 7 | _next_ | Benchmarking the packer (JMH) |
 
 ## Reference
 - [Roadmap](ROADMAP.md) · [Progress](PROGRESS.md)

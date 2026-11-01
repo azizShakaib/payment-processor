@@ -26,6 +26,26 @@ public final class Pan {
                 + pan.substring(length - LAST_DIGITS);
     }
 
+    /**
+     * Masks anything that might be a PAN, and never throws. For a logging path:
+     * a bad value must not turn a diagnostic line into an exception. A valid PAN
+     * (12-19 ASCII digits) is masked like {@link #mask}; anything else, even
+     * a near-miss such as a PAN with one typo, becomes {@code "[16 chars]"}
+     * (or {@code "[null]"}), revealing no character of the input.
+     */
+    public static String maskLenient(String value) {
+        if (value == null) {
+            return "[null]";
+        }
+        int length = value.length();
+        boolean valid = length >= MIN_LENGTH && length <= MAX_LENGTH;
+        for (int i = 0; valid && i < length; i++) {
+            char c = value.charAt(i);
+            valid = c >= '0' && c <= '9';
+        }
+        return valid ? mask(value) : "[" + length + " chars]";
+    }
+
     /** Luhn mod-10 check, the checksum every issuer builds into card numbers. */
     public static boolean isLuhnValid(String pan) {
         validate(pan);

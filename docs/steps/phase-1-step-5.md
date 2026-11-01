@@ -307,4 +307,4 @@ Try to answer each before running it.
 
 ## Next step
 
-Step 6: a masked pretty-printer (coming next)
+[Step 6: a masked pretty-printer](phase-1-step-6.md)
