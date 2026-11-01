@@ -317,4 +317,4 @@ Predict the output before you run it (no answers here):
 
 ## Next step
 
-Step 7: benchmarking the packer with JMH (coming next)
+[Step 7: benchmarking the packer with JMH](phase-1-step-7.md)

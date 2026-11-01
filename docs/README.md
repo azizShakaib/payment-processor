@@ -24,7 +24,8 @@ Terminal ──> Acquirer ──> Switch ──> Issuer          (services, Phas
 | 4 | [phase-1-step-4](steps/phase-1-step-4.md) | MTI, message lifecycle, response codes, money |
 | 5 | [phase-1-step-5](steps/phase-1-step-5.md) | Packing whole messages; why one wrong field breaks the rest |
 | 6 | [phase-1-step-6](steps/phase-1-step-6.md) | Masking: logging messages without leaking card data |
-| 7 | _next_ | Benchmarking the packer (JMH) |
+| 7 | [phase-1-step-7](steps/phase-1-step-7.md) | Benchmarking the packer (JMH); [results](benchmarks/phase-1.md) |
+| 8 | _next_ | Netty transport |
 
 ## Reference
 - [Roadmap](ROADMAP.md) · [Progress](PROGRESS.md)

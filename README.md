@@ -9,7 +9,7 @@ This is a learning and portfolio project. Real-money concerns (PCI-DSS certifica
 | Phase | Focus | Status |
 | --- | --- | --- |
 | 0 | TCP framing, repo setup | Done |
-| 1 | ISO 8583 library, Netty server, 0800 sign-on and echo | In progress: steps 0–6 of 10 done |
+| 1 | ISO 8583 library, Netty server, 0800 sign-on and echo | In progress: steps 0–7 of 10 done |
 | 2 | Issuer authorization host, double-entry ledger | Planned |
 | 3 | Network switch: BIN routing, STIP, reversals | Planned |
 | 4 | Terminal simulator, load generator, latency | Planned |
@@ -39,8 +39,9 @@ Every arrow is ISO 8583 over TCP with a length header. Services are Spring Boot 
 | 4 | MTI, immutable message model, response codes, `Money` | Done |
 | 5 | `IsoPacker`: whole messages to bytes and back (ASCII 0100 = 159 bytes, compact = 92) | Done |
 | 6 | `IsoPrinter`: masked, readable messages; `safeDump` for raw frames | Done |
-| 7 | JMH benchmarks | Next |
-| 8–9 | Netty transport, `iso8583-link` sign-on/echo/keep-alive | Planned |
+| 7 | JMH benchmarks: unpack 0100 ≈ 1.1 µs, pack ≈ 2.1 µs ([results](docs/benchmarks/phase-1.md)) | Done |
+| 8 | Netty transport | Next |
+| 9 | `iso8583-link` sign-on/echo/keep-alive | Planned |
 
 ## Modules
 
@@ -49,6 +50,7 @@ Every arrow is ISO 8583 over TCP with a length header. Services are Spring Boot 
 | `common` | Hex dumps, PAN masking (strict and lenient) and Luhn check, STAN generator, `Money` (minor units + currency) |
 | `transport` | TCP framing (`FrameCodec`), echo server and client |
 | `iso8583-core` | Field specs, field codecs, bitmaps, MTI, `IsoMessage`, response codes, `IsoPacker`, masked `IsoPrinter` |
+| `benchmarks` | JMH benchmarks for the packer and printer; compiled every build, run on demand |
 
 ## Run it
 
@@ -59,6 +61,7 @@ On Windows with antivirus HTTPS scanning (Avast, Kaspersky, corporate proxies), 
 ```bash
 ./mvnw verify                                                    # compile and run all tests
 ./mvnw -q -pl iso8583-core -am test                              # just the ISO 8583 library
+./mvnw -q -pl benchmarks -am package -DskipTests && java -jar benchmarks/target/benchmarks.jar -prof gc   # JMH, ~3.5 min
 ./mvnw -q -pl transport -am compile exec:java                    # echo an ISO 8583 0800 message with a 2-byte binary header
 ./mvnw -q -pl transport -am compile exec:java -Dexec.args=ASCII_4 # same, with a 4-digit ASCII header
 docker compose up -d                     # Postgres for later phases

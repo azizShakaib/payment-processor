@@ -15,6 +15,8 @@
         <module>transport</module>
         <!-- Phase 1 -->
         <module>iso8583-core</module>
+        <!-- Phase 1 step 7: JMH benchmarks (compiled in every build, run on demand) -->
+        <module>benchmarks</module>
         <!-- Added in later phases:
              Phase 2: issuer
              Phase 3: switch, acquirer
@@ -35,6 +37,8 @@
         <surefire-plugin.version>3.5.2</surefire-plugin.version>
         <exec-plugin.version>3.5.0</exec-plugin.version>
         <enforcer-plugin.version>3.5.0</enforcer-plugin.version>
+        <shade-plugin.version>3.6.0</shade-plugin.version>
+        <jmh.version>1.37</jmh.version>
     </properties>
 
     <dependencyManagement>
@@ -102,6 +106,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${surefire-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>${shade-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <!-- Runs a module's main class: ./mvnw -q -pl transport -am compile exec:java -->
