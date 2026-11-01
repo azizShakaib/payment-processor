@@ -9,8 +9,8 @@ This is a learning and portfolio project. Real-money concerns (PCI-DSS certifica
 | Phase | Focus | Status |
 | --- | --- | --- |
 | 0 | TCP framing, repo setup | Done |
-| 1 | ISO 8583 library, Netty server, 0800 sign-on and echo | Code complete (steps 0–9); wrap-up next |
-| 2 | Issuer authorization host, double-entry ledger | Planned |
+| 1 | ISO 8583 library, Netty server, 0800 sign-on and echo | Done (exercises in progress) |
+| 2 | Issuer authorization host, double-entry ledger | Next |
 | 3 | Network switch: BIN routing, STIP, reversals | Planned |
 | 4 | Terminal simulator, load generator, latency | Planned |
 | 5 | Clearing and settlement (Spring Batch) | Planned |
@@ -42,7 +42,7 @@ Every arrow is ISO 8583 over TCP with a length header. Services are Spring Boot 
 | 7 | JMH benchmarks: unpack 0100 ≈ 1.1 µs, pack ≈ 2.1 µs ([results](docs/benchmarks/phase-1.md)) | Done |
 | 8 | Netty transport: framed server/client, reconnect with backoff, idle detection | Done |
 | 9 | `iso8583-link`: automatic sign-on, echo keep-alive, request/response matching | Done |
-| 10 | Phase wrap-up: lesson, exercises, LinkedIn post | Next |
+| 10 | Phase wrap-up: lesson, exercises, LinkedIn draft | Done |
 
 ## Modules
 
@@ -74,3 +74,4 @@ docker compose up -d                     # Postgres for later phases
 Every build step has a doc explaining the payments concept, a byte-by-byte message walk-through and how to try it yourself. Start at the [docs index](docs/README.md).
 
 - [Phase 0: TCP framing and ISO 8583 basics](docs/lessons/phase-0.md)
+- [Phase 1: the ISO 8583 library and long-lived links](docs/lessons/phase-1.md)

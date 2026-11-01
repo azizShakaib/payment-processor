@@ -153,6 +153,10 @@ FINE: Disconnected: /127.0.0.1:57983
 
 The payload never appears. A real 0100 carries a PAN in field 2, and "it is only a debug log" is how card numbers end up in log archives that nobody classified as cardholder data. Phase 0's `EchoServer` used to log `Hex.dump(frame)` at `FINER`; it now logs `From <peer>: 55 byte frame`, with a comment saying why. Even the stream error messages use only lengths and (for a bad ASCII header) the single offending byte.
 
+### 3.3 A Windows quirk the tests ran into
+
+When 50 clients connect to a localhost server in the same instant, Windows occasionally fails one of them with `SocketException: Invalid argument: setsockopt`. It is a burst-connect quirk of the Windows loopback stack, not a Netty bug: in a reproduction over 150 rounds, the Phase 0 blocking `EchoServer` hit it far more often than `NettyFrameServer`, and a bigger accept backlog did not help. The tests (`NettyServerClientTest`, and Phase 0's `EchoServerTest` since step 10) therefore open their connections one after another and then run the traffic concurrently, which still proves concurrent serving. Real terminals do not all connect in the same microsecond, but a recovering network can come close, which is one more reason clients use jittered backoff.
+
 ## 4. Design and flow
 
 ### 4.1 Client to server, one request and reply

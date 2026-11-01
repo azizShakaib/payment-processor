@@ -93,24 +93,35 @@ class EchoServerTest {
     void servesManyClientsConcurrently() throws Exception {
         int clients = 50;
         int framesEach = 20;
+        // Connect one after another: a burst of simultaneous connects to a loopback listener is
+        // occasionally reset on Windows ("SocketException: Invalid argument: setsockopt", see
+        // docs/steps/phase-1-step-8.md). The echo traffic afterwards is fully concurrent, which
+        // is what this test is about.
+        List<FrameClient> connections = new ArrayList<>();
         try (ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (int c = 0; c < clients; c++) {
+                connections.add(new FrameClient("localhost", server.port(), codec, TIMEOUT));
+            }
             List<Callable<Boolean>> tasks = new ArrayList<>();
             for (int c = 0; c < clients; c++) {
                 int id = c;
+                FrameClient client = connections.get(c);
                 tasks.add(() -> {
-                    try (FrameClient client = new FrameClient("localhost", server.port(), codec, TIMEOUT)) {
-                        for (int i = 0; i < framesEach; i++) {
-                            byte[] payload = ("client-" + id + "-frame-" + i).getBytes(StandardCharsets.US_ASCII);
-                            if (!java.util.Arrays.equals(client.sendAndReceive(payload), payload)) {
-                                return false;
-                            }
+                    for (int i = 0; i < framesEach; i++) {
+                        byte[] payload = ("client-" + id + "-frame-" + i).getBytes(StandardCharsets.US_ASCII);
+                        if (!java.util.Arrays.equals(client.sendAndReceive(payload), payload)) {
+                            return false;
                         }
-                        return true;
                     }
+                    return true;
                 });
             }
             for (Future<Boolean> result : pool.invokeAll(tasks)) {
                 assertThat(result.get()).isTrue();
+            }
+        } finally {
+            for (FrameClient client : connections) {
+                client.close();
             }
         }
         assertThat(server.framesEchoed()).isEqualTo((long) clients * framesEach);

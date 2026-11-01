@@ -1,12 +1,12 @@
 # Progress
 
-Current phase: **1 (step 10 of 10: wrap-up)**; Phase 0 exercises run in parallel.
-Next: Phase 1 step 10 (lesson `docs/lessons/phase-1.md`, LinkedIn draft). Phase 1 done criteria met: round trips, JMH recorded, sign-on + echo over Netty. Known flake: Phase 0 `EchoServerTest.servesManyClientsConcurrently` (Windows burst connect). Note for step 7: `IsoPacker.unpack` slice overload copies buffer[0..end). Agreed plan in `docs/ROADMAP.md`, Phase 1.
+Current phase: **1 done (code); Phase 1 exercises in progress**; Phase 0 exercises run in parallel.
+Next: you do Phase 1 exercises (`docs/lessons/phase-1.md`, Phase 0's in parallel); then plan Phase 2 (issuer).
 
 | Phase | Status | Notes |
 | --- | --- | --- |
 | 0 Foundations | Code done, exercises pending | `common`, `transport`, Docker Compose, CI, lesson written |
-| 1 ISO 8583 library | In progress | Plan agreed 2026-10-31 |
+| 1 ISO 8583 library | Code done 2026-11-01, exercises pending | 10 steps, step docs in `docs/steps/`, lesson written |
 | 2 Issuer host | Not started | |
 | 3 Switch + acquirer | Not started | |
 | 4 Terminal sim + load | Not started | |
@@ -46,4 +46,5 @@ Next: Phase 1 step 10 (lesson `docs/lessons/phase-1.md`, LinkedIn draft). Phase 
 | --- | --- | --- |
 | 2026-10-20 | Kickoff: what I'm building and why | ? |
 | after Phase 0 | TCP is a byte stream: the framing bug every beginner hits | Planned |
+| after Phase 1 | Building an ISO 8583 parser: one wrong field shifts the rest (`docs/linkedin/phase-1.md`) | Drafted, not posted |
 (Full schedule in `docs/ROADMAP.md`, section LinkedIn.)
