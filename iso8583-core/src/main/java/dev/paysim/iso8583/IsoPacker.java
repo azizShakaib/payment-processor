@@ -7,7 +7,6 @@ import dev.paysim.iso8583.codec.Unpacked;
 import dev.paysim.iso8583.codec.UnpackedBitmap;
 import dev.paysim.iso8583.spec.MessageSpec;
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -59,8 +58,9 @@ public final class IsoPacker {
     /**
      * Parses exactly {@code buffer[offset, offset + length)} as one message.
      * Error offsets are absolute positions in {@code buffer}. A slice that
-     * ends before the buffer does costs a copy of the bytes up to its end, so
-     * that field codecs cannot read past the slice and offsets stay absolute.
+     * ends before the buffer does costs nothing extra: the end is passed to the
+     * codecs as an exclusive limit, so they cannot read past the slice and
+     * offsets stay absolute.
      *
      * @throws IsoParseException if the bytes do not match the spec, including
      *         a field set in the bitmap but not defined in the spec and bytes
@@ -75,10 +75,9 @@ public final class IsoPacker {
                     + " is outside a buffer of " + buffer.length + " bytes");
         }
         int end = offset + length;
-        byte[] bytes = end == buffer.length ? buffer : Arrays.copyOf(buffer, end);
 
-        MtiCodec.UnpackedMti mti = MtiCodec.unpack(spec.mtiEncoding(), bytes, offset);
-        UnpackedBitmap bitmap = BitmapCodec.unpack(spec.bitmapEncoding(), bytes, mti.nextOffset());
+        MtiCodec.UnpackedMti mti = MtiCodec.unpack(spec.mtiEncoding(), buffer, offset, end);
+        UnpackedBitmap bitmap = BitmapCodec.unpack(spec.bitmapEncoding(), buffer, mti.nextOffset(), end);
         FieldValue[] values = new FieldValue[MAX_FIELD + 1];
         int position = bitmap.nextOffset();
         int last = 1;
@@ -87,7 +86,7 @@ public final class IsoPacker {
                 throw new IsoParseException(field, position,
                         "present in bitmap but not defined in spec " + spec.name());
             }
-            Unpacked unpacked = FieldCodec.unpack(spec.field(field), bytes, position);
+            Unpacked unpacked = FieldCodec.unpack(spec.field(field), buffer, position, end);
             values[field] = unpacked.value();
             position = unpacked.nextOffset();
             last = field;

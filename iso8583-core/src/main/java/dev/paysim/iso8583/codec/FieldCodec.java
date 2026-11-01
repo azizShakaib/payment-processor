@@ -97,10 +97,27 @@ public final class FieldCodec {
      * the end reports the offset where that read started.
      */
     public static Unpacked unpack(FieldSpec spec, byte[] buffer, int offset) {
+        Objects.requireNonNull(buffer, "buffer must not be null");
+        return unpack(spec, buffer, offset, buffer.length);
+    }
+
+    /**
+     * Like {@link #unpack(FieldSpec, byte[], int)} but reads only below the
+     * exclusive {@code limit}: a byte at or past it is never touched, so a
+     * field that crosses it fails as truncated even if the buffer goes on.
+     * An {@code offset} past {@code limit} means zero bytes left.
+     *
+     * @throws IllegalArgumentException if {@code offset} is negative or
+     *         {@code limit} lies beyond the buffer
+     */
+    public static Unpacked unpack(FieldSpec spec, byte[] buffer, int offset, int limit) {
         Objects.requireNonNull(spec, "spec must not be null");
         Objects.requireNonNull(buffer, "buffer must not be null");
         if (offset < 0) {
             throw new IllegalArgumentException("offset must not be negative, got " + offset);
+        }
+        if (limit > buffer.length) {
+            throw new IllegalArgumentException("limit " + limit + " is beyond a buffer of " + buffer.length + " bytes");
         }
         int field = spec.number();
         int length;
@@ -109,11 +126,11 @@ public final class FieldCodec {
             length = spec.maxLength();
             dataStart = offset;
         } else {
-            length = LengthPrefix.read(spec, buffer, offset);
+            length = LengthPrefix.read(spec, buffer, offset, limit);
             dataStart = offset + LengthPrefix.width(spec);
         }
         int wire = wireBytes(spec, length);
-        requireBytes(field, buffer, dataStart, wire);
+        requireBytes(field, limit, dataStart, wire);
         FieldValue value;
         if (spec.type() == FieldType.B) {
             value = FieldValue.binary(spec.encoding() == Encoding.BINARY
@@ -132,8 +149,8 @@ public final class FieldCodec {
         return new Unpacked(value, dataStart + wire);
     }
 
-    static void requireBytes(int field, byte[] buffer, int offset, int needed) {
-        int left = Math.max(0, buffer.length - offset);
+    static void requireBytes(int field, int limit, int offset, int needed) {
+        int left = Math.max(0, limit - offset);
         if (left < needed) {
             throw new IsoParseException(field, offset, "needs " + needed + " bytes, only " + left + " left");
         }

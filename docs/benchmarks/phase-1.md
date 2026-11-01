@@ -40,6 +40,19 @@ Wire sizes for reference: ASCII 0100 is 159 bytes, compact 0100 is 92 bytes.
 
 The two JMH modes are separate runs, so allocation per op can differ slightly between them (for example `formatAscii0100` measured 17,856 B/op in the first full run and 18,504 in this one; the JIT's escape analysis varies run to run). Differences of a few percent in bytes/op are noise; differences of 2x or more are real.
 
+## After the slice fix
+
+The `SliceNearEnd` row above is the "before". The packer no longer copies: `IsoPacker.unpack(spec, buffer, offset, length)` passes `offset + length` down to `MtiCodec`, `BitmapCodec` and `FieldCodec` as an exclusive `limit`, and every bounds check counts to that limit instead of `buffer.length`. Same machine and settings, re-run after the change (`SliceBenchmark` and `PackerBenchmark.unpackAscii0100`, AverageTime with `-prof gc`):
+
+| Benchmark | Before ns/op | After ns/op | Before B/op | After B/op |
+| --- | ---: | ---: | ---: | ---: |
+| `SliceBenchmark.unpackSliceAtStart` | 1,027 | 992 | 5,152 | 4,976 |
+| `SliceBenchmark.unpackSliceFlushWithEnd` | 1,057 | 1,046 | 4,616 | 4,616 |
+| `SliceBenchmark.unpackSliceNearEnd` | 7,127 | 1,029 | 70,528 | 4,616 |
+| `PackerBenchmark.unpackAscii0100` | 1,068 | 1,022 | 4,616 | 4,616 |
+
+The worst slice position now costs the same as any other (about 1 microsecond, 4.6 KB), and the normal whole-buffer path is unchanged.
+
 ## Interpretation
 
 1. A 0100 unpacks in about 1.1 microseconds and packs in about 2.1 microseconds on this machine. A single thread could parse roughly 900,000 such messages per second; the network, not the parser, will be the limit long before that.
@@ -47,7 +60,7 @@ The two JMH modes are separate runs, so allocation per op can differ slightly be
 3. ASCII versus compact is close: compact pack is about 6% slower than ASCII (within the error bars), compact unpack is about 15% slower but allocates about 25% less (3,480 versus 4,616 B/op). The BCD decode does more arithmetic per field, the ASCII decode builds more intermediate strings. Compact's gain is 67 fewer bytes on the wire (92 versus 159), not CPU time.
 4. The 0800 echo (3 fields) costs about 0.5 microseconds either way: cost grows with the number of fields, not with message length alone.
 5. Unpack allocates 4.6 KB for a 159-byte message, about 29 bytes of garbage per wire byte. The fixed `FieldValue[129]` array alone is about 530 bytes; the rest is per-field strings and value objects. This is the number to watch in Phase 4 (load generator) and Phase 7 (GC pressure).
-6. The slice overload is cheap at the start of a buffer (copy of about 160 bytes, 1.03 microseconds) and free when the slice ends exactly at the buffer end (1.06 microseconds), but a slice that ends 1 byte before the end of a 64 KiB buffer copies about 64 KiB: 7.1 microseconds and 70.5 KB per message, about 7x slower and 15x the garbage. A link that reads frames into a large reusable buffer would hit this on every frame. This confirms the cost documented in step 5; the benchmark first drew the wrong picture (see step 7 doc, "A benchmark bug worth keeping").
+6. The slice overload is cheap at the start of a buffer (copy of about 160 bytes, 1.03 microseconds) and free when the slice ends exactly at the buffer end (1.06 microseconds), but a slice that ends 1 byte before the end of a 64 KiB buffer copies about 64 KiB: 7.1 microseconds and 70.5 KB per message, about 7x slower and 15x the garbage. A link that reads frames into a large reusable buffer would hit this on every frame. This confirms the cost documented in step 5 (since removed, see "After the slice fix"); the benchmark first drew the wrong picture (see step 7 doc, "A benchmark bug worth keeping").
 7. Formatting a message for a log costs about 9.6 microseconds, roughly 9x an unpack, and allocates about 18.5 KB (4x the unpack). Unpack plus format is 10.8 microseconds, so on a hot path a DEBUG log line costs about ten times the work of parsing the message. Guard it behind a level check (`if (log.isDebugEnabled())`), never format eagerly.
 8. Round trip (pack then unpack) is 3.2 microseconds, close to the sum of the parts (2.1 + 1.1), as expected.
 

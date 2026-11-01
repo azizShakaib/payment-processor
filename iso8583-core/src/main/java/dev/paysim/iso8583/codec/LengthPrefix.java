@@ -38,9 +38,9 @@ final class LengthPrefix {
     }
 
     /** Reads and range-checks the prefix at {@code offset}; errors point at the prefix. */
-    static int read(FieldSpec spec, byte[] buffer, int offset) {
+    static int read(FieldSpec spec, byte[] buffer, int offset, int limit) {
         int width = width(spec);
-        FieldCodec.requireBytes(spec.number(), buffer, offset, width);
+        FieldCodec.requireBytes(spec.number(), limit, offset, width);
         int digits = spec.lengthKind().prefixDigits();
         int length = 0;
         if (spec.encoding() == Encoding.ASCII) {

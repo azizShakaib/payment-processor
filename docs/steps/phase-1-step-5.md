@@ -200,7 +200,7 @@ sequenceDiagram
     participant F as FieldCodec
     participant I as IsoMessage
     C->>U: unpack(spec, buffer, offset, length)
-    U->>U: check slice, cut buffer at offset+length
+    U->>U: check slice, limit = offset+length (no copy since step 7)
     U->>M: unpack(mtiEncoding, bytes, offset)
     M-->>U: Mti, next offset
     U->>B: unpack(bitmapEncoding, bytes, next)
@@ -229,7 +229,7 @@ sequenceDiagram
 
 **Unpack reports a field the spec lacks.** The bitmap announces a field; the spec has no definition. Without a definition there is no length, so parsing cannot continue. The error names that field and the offset where its data would start.
 
-**Slices keep absolute offsets.** `unpack(spec, buffer, offset, length)` is for a network link that reads a frame into the middle of a larger buffer. Errors point into `buffer`, not into the slice, so a hex trace of the whole buffer lines up. The field codecs bounds-check against the array length, so a slice that ends before the array does is copied up to its end first. That is the one allocation the slice overload costs; the whole-buffer overload skips it.
+**Slices keep absolute offsets.** `unpack(spec, buffer, offset, length)` is for a network link that reads a frame into the middle of a larger buffer. Errors point into `buffer`, not into the slice, so a hex trace of the whole buffer lines up. The field codecs bounds-check against the array length, so a slice that ends before the array does is copied up to its end first. That is the one allocation the slice overload costs; the whole-buffer overload skips it. (Replaced in [step 7](phase-1-step-7.md): the codecs now take an exclusive `limit`, so the slice overload no longer copies.)
 
 **The key property is byte-stability, not object equality.** `pack(unpack(bytes))` equals `bytes` for every message the library accepts. Object equality after a round trip holds only when fixed fields were set at full length: `unpack` returns the padded wire value (by design since step 2), so a message built with a short `"0"` for a six-digit field comes back as `"000000"`. The bytes are the same either way. `IsoPackerGoldenTest` checks both facts.
 

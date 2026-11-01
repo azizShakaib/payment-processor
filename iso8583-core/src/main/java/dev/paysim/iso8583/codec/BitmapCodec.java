@@ -51,14 +51,32 @@ public final class BitmapCodec {
      * starts.
      */
     public static UnpackedBitmap unpack(Encoding encoding, byte[] buffer, int offset) {
+        Objects.requireNonNull(buffer, "buffer must not be null");
+        return unpack(encoding, buffer, offset, buffer.length);
+    }
+
+    /**
+     * Like {@link #unpack(Encoding, byte[], int)} but reads only below the
+     * exclusive {@code limit}; bytes at or past it are never touched.
+     *
+     * @throws IllegalArgumentException if {@code offset} is negative or
+     *         {@code limit} lies beyond the buffer
+     */
+    public static UnpackedBitmap unpack(Encoding encoding, byte[] buffer, int offset, int limit) {
         Objects.requireNonNull(encoding, "encoding must not be null");
         Objects.requireNonNull(buffer, "buffer must not be null");
         checkEncoding(encoding);
-        long primary = readWord(encoding, buffer, offset, "primary");
+        if (offset < 0) {
+            throw new IllegalArgumentException("offset must not be negative, got " + offset);
+        }
+        if (limit > buffer.length) {
+            throw new IllegalArgumentException("limit " + limit + " is beyond a buffer of " + buffer.length + " bytes");
+        }
+        long primary = readWord(encoding, buffer, offset, limit, "primary");
         int next = offset + wireLength(encoding);
         long secondary = 0L;
         if (primary < 0) { // bit 1, the most significant bit, is the sign bit
-            secondary = readWord(encoding, buffer, next, "secondary");
+            secondary = readWord(encoding, buffer, next, limit, "secondary");
             if (secondary == 0L) {
                 throw new IsoParseException(FIELD, next, "secondary bitmap flagged but empty");
             }
@@ -67,11 +85,11 @@ public final class BitmapCodec {
         return new UnpackedBitmap(Bitmap.fromWords(primary, secondary), next);
     }
 
-    private static long readWord(Encoding encoding, byte[] buffer, int start, String which) {
+    private static long readWord(Encoding encoding, byte[] buffer, int start, int limit, String which) {
         int length = wireLength(encoding);
-        if (start < 0 || start > buffer.length || buffer.length - start < length) {
+        if (start > limit || limit - start < length) {
             throw new IsoParseException(FIELD, start, "truncated " + which + " bitmap, need " + length
-                    + " bytes, have " + Math.max(0, buffer.length - start));
+                    + " bytes, have " + Math.max(0, limit - start));
         }
         byte[] raw = encoding == Encoding.ASCII
                 ? HexCodec.decode(FIELD, buffer, start, WORD_BYTES)

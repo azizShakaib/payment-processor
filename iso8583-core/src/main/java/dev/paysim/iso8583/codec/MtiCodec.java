@@ -55,11 +55,26 @@ public final class MtiCodec {
      */
     public static UnpackedMti unpack(Encoding encoding, byte[] buffer, int offset) {
         Objects.requireNonNull(buffer, "buffer must not be null");
+        return unpack(encoding, buffer, offset, buffer.length);
+    }
+
+    /**
+     * Like {@link #unpack(Encoding, byte[], int)} but reads only below the
+     * exclusive {@code limit}; bytes at or past it are never touched.
+     *
+     * @throws IllegalArgumentException if {@code offset} is negative or
+     *         {@code limit} lies beyond the buffer
+     */
+    public static UnpackedMti unpack(Encoding encoding, byte[] buffer, int offset, int limit) {
+        Objects.requireNonNull(buffer, "buffer must not be null");
         int length = wireLength(encoding);
         if (offset < 0) {
             throw new IllegalArgumentException("offset must not be negative, got " + offset);
         }
-        int left = Math.max(0, buffer.length - offset);
+        if (limit > buffer.length) {
+            throw new IllegalArgumentException("limit " + limit + " is beyond a buffer of " + buffer.length + " bytes");
+        }
+        int left = Math.max(0, limit - offset);
         if (left < length) {
             throw new IsoParseException(FIELD, offset, "truncated MTI, need " + length + " bytes, have " + left);
         }

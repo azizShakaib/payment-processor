@@ -117,7 +117,20 @@ Step 5 documented that `IsoPacker.unpack(spec, buffer, offset, length)` copies `
 | ends exactly at the buffer's end | none (whole-buffer shortcut) | 1,057 | 4,616 |
 | ends one byte before the buffer's end | about 64 KiB | 7,127 | 70,528 |
 
-So the copy is free in the common cases of "frame at the start of a small buffer" or "frame flush with the end", and costs about 6 microseconds and 66 KB per message in the worst case. A link that reads frames into one large reusable buffer and passes offsets would hit that worst case on most frames. The honest reading: this is a known, bounded cost that the design accepted for safety and absolute error offsets; now it has a number, and step 9 can decide whether it needs a bounds-limited codec overload instead.
+So the copy is free in the common cases of "frame at the start of a small buffer" or "frame flush with the end", and costs about 6 microseconds and 66 KB per message in the worst case. A link that reads frames into one large reusable buffer and passes offsets would hit that worst case on most frames. The reading at the time: a known, bounded cost the step 5 design accepted for safety and absolute error offsets. Once it had a number, it was cheap to remove, as the next subsection shows.
+
+#### The fix
+
+The measurement made the fix obvious, so it was done right after, in its own change. `FieldCodec`, `BitmapCodec` and `MtiCodec` gained a 4-argument `unpack(..., offset, limit)` that treats `limit` as the exclusive end and uses it in every bounds check (the old 3-argument methods delegate with `limit = buffer.length`). `IsoPacker.unpack(spec, buffer, offset, length)` now passes `offset + length` as the limit and no longer copies. Error offsets are still absolute positions in `buffer`, and bytes past the slice are never read, even when they would have completed a truncated field (new tests `IsoPackerSliceTest` and `LimitedReadTest` pin that).
+
+| Benchmark | Before ns/op | After ns/op | Before B/op | After B/op |
+| --- | ---: | ---: | ---: | ---: |
+| `unpackSliceAtStart` | 1,027 | 992 | 5,152 | 4,976 |
+| `unpackSliceFlushWithEnd` | 1,057 | 1,046 | 4,616 | 4,616 |
+| `unpackSliceNearEnd` | 7,127 | 1,029 | 70,528 | 4,616 |
+| `PackerBenchmark.unpackAscii0100` (no regression) | 1,068 | 1,022 | 4,616 | 4,616 |
+
+Why thread a limit rather than copy: the copy existed only so that code checking `buffer.length` would stop at the slice end. Passing the end as a number gives the same guarantee for free, and the cost no longer depends on where the frame sits in the buffer. Lesson: measure, then fix, then re-measure. The baseline made the problem concrete, and the second run confirms the fix helped and that the normal path did not get slower. (The "measuring step does not change what it measures" decision below still holds: the fix is a separate change after the baseline.)
 
 ### 3.4 What logging costs
 
@@ -241,7 +254,7 @@ Write your prediction down before running each one: a number or a ratio, and a o
 - **Shaded (uber) jar:** one jar containing the module and all its dependencies, so JMH's forks have a complete classpath.
 - **Reversal:** a 04xx message that undoes a request the sender could not confirm, typically after a timeout.
 - **Hot path:** code that runs for every transaction; small costs here are multiplied by volume.
-- **Slice (overload):** unpacking from an offset and length inside a larger buffer; costs a copy unless the slice ends at the buffer's end.
+- **Slice (overload):** unpacking from an offset and length inside a larger buffer; bounded by an exclusive limit, no copy (it used to copy before the fix described in section 3.3).
 
 ## Next step
 
