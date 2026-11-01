@@ -15,6 +15,8 @@
         <module>transport</module>
         <!-- Phase 1 -->
         <module>iso8583-core</module>
+        <!-- Phase 1 step 9: sign-on, echo and request matching over transport -->
+        <module>iso8583-link</module>
         <!-- Phase 1 step 7: JMH benchmarks (compiled in every build, run on demand) -->
         <module>benchmarks</module>
         <!-- Added in later phases:
@@ -57,6 +59,11 @@
             <dependency>
                 <groupId>dev.paysim</groupId>
                 <artifactId>iso8583-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.paysim</groupId>
+                <artifactId>iso8583-link</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

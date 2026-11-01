@@ -9,7 +9,7 @@ This is a learning and portfolio project. Real-money concerns (PCI-DSS certifica
 | Phase | Focus | Status |
 | --- | --- | --- |
 | 0 | TCP framing, repo setup | Done |
-| 1 | ISO 8583 library, Netty server, 0800 sign-on and echo | In progress: steps 0–8 of 10 done |
+| 1 | ISO 8583 library, Netty server, 0800 sign-on and echo | Code complete (steps 0–9); wrap-up next |
 | 2 | Issuer authorization host, double-entry ledger | Planned |
 | 3 | Network switch: BIN routing, STIP, reversals | Planned |
 | 4 | Terminal simulator, load generator, latency | Planned |
@@ -41,7 +41,8 @@ Every arrow is ISO 8583 over TCP with a length header. Services are Spring Boot 
 | 6 | `IsoPrinter`: masked, readable messages; `safeDump` for raw frames | Done |
 | 7 | JMH benchmarks: unpack 0100 ≈ 1.1 µs, pack ≈ 2.1 µs ([results](docs/benchmarks/phase-1.md)) | Done |
 | 8 | Netty transport: framed server/client, reconnect with backoff, idle detection | Done |
-| 9 | `iso8583-link` sign-on/echo/keep-alive | Next |
+| 9 | `iso8583-link`: automatic sign-on, echo keep-alive, request/response matching | Done |
+| 10 | Phase wrap-up: lesson, exercises, LinkedIn post | Next |
 
 ## Modules
 
@@ -50,6 +51,7 @@ Every arrow is ISO 8583 over TCP with a length header. Services are Spring Boot 
 | `common` | Hex dumps, PAN masking (strict and lenient) and Luhn check, STAN generator, `Money` (minor units + currency) |
 | `transport` | TCP framing; blocking echo server/client (Phase 0); Netty `NettyFrameServer`/`NettyFrameClient` with per-connection ordered dispatch on virtual threads |
 | `iso8583-core` | Field specs, field codecs, bitmaps, MTI, `IsoMessage`, response codes, `IsoPacker`, masked `IsoPrinter` |
+| `iso8583-link` | ISO 8583 over Netty: `IsoLinkClient`/`IsoLinkServer`, sign-on/off, echo, `PendingRequests` matching by STAN + 7 + 32 + 41 |
 | `benchmarks` | JMH benchmarks for the packer and printer; compiled every build, run on demand |
 
 ## Run it

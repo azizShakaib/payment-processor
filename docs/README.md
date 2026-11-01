@@ -26,7 +26,8 @@ Terminal ──> Acquirer ──> Switch ──> Issuer          (services, Phas
 | 6 | [phase-1-step-6](steps/phase-1-step-6.md) | Masking: logging messages without leaking card data |
 | 7 | [phase-1-step-7](steps/phase-1-step-7.md) | Benchmarking the packer (JMH); [results](benchmarks/phase-1.md) |
 | 8 | [phase-1-step-8](steps/phase-1-step-8.md) | Long-lived links over Netty: framing, reconnect, idle detection |
-| 9 | _next_ | Sign-on, echo and keep-alive |
+| 9 | [phase-1-step-9](steps/phase-1-step-9.md) | Sign-on, echo, keep-alive and matching responses to requests |
+| 10 | _next_ | Phase 1 lesson and exercises |
 
 ## Reference
 - [Roadmap](ROADMAP.md) · [Progress](PROGRESS.md)

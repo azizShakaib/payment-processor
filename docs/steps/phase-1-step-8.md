@@ -267,4 +267,4 @@ Predict, then try (no answers given):
 - **Fail fast**: report an error immediately instead of hiding it in a queue.
 - **Serial executor**: runs tasks one at a time in submission order on top of a shared pool.
 
-Next step: Step 9: sign-on, echo and keep-alive in iso8583-link (coming next)
+Next step: [Step 9: the ISO 8583 link (sign-on, echo, matching)](phase-1-step-9.md)

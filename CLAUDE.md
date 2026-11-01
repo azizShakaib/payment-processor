@@ -23,7 +23,7 @@ I'm from fintech but the domain is vast; this project is how I learn it. Docs ar
 - In chat, give me a short conceptual summary: what was built, how the flow works, how to test it myself.
 
 ## Architecture rules
-- Shared libraries (`common`, `transport`, `iso8583-core`) are plain Java. No Spring, no Lombok.
+- Shared libraries (`common`, `transport`, `iso8583-core`, `iso8583-link`) are plain Java. No Spring, no Lombok.
 - Services (`issuer`, `switch`, `acquirer`, `clearing`, `hsm-sim`) are Spring Boot apps hosting a Netty TCP server. Spring handles config, DI, Actuator and admin REST only, never the ISO 8583 path.
 - Spring Batch only in `clearing`. Kafka for clearing and audit events. Postgres for ledger and cards. Redis for idempotency and BIN cache.
 - Split services only where real companies split. No extra microservices inside one party.
